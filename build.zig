@@ -3,10 +3,21 @@ const std = @import("std");
 pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
 
+    const optimize = b.standardOptimizeOption(.{});
+
     const mod = b.addModule("rayzig", .{
         .root_source_file = b.path("src/root.zig"),
         .target = target,
     });
+
+    const raylib_dep = b.dependency("raylib", .{
+        .target = target,
+        .optimize = optimize,
+    });
+
+    const raylib = raylib_dep.artifact("raylib");
+
+    mod.linkLibrary(raylib);
 
     const mod_tests = b.addTest(.{
         .root_module = mod,

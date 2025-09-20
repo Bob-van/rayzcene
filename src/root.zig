@@ -1,31 +1,58 @@
-//! By convention, root.zig is the root source file when making a library.
-const std = @import("std");
+const scene = @import("engine/scene.zig");
 
-pub fn bufferedPrint() !void {
-    // Stdout is for the actual output of your application, for example if you
-    // are implementing gzip, then only the compressed bytes should be sent to
-    // stdout, not any debugging messages.
-    var stdout_buffer: [1024]u8 = undefined;
-    var stdout_writer = std.fs.File.stdout().writer(&stdout_buffer);
-    const stdout = &stdout_writer.interface;
+const renderer = @import("engine/renderer.zig");
 
-    try stdout.print("Run `zig build test` to run the tests.\n", .{});
+pub const ScreenPreset = struct {
+    width: f32,
+    height: f32,
+    ratio: f32,
 
-    try stdout.flush(); // Don't forget to flush!
-}
+    pub fn init(width: f32, height: f32) @This() {
+        return .{
+            .width = width,
+            .height = height,
+            .ratio = width / height,
+        };
+    }
+};
 
-pub fn add(a: i32, b: i32) i32 {
-    return a + b;
-}
+pub const RenderableScene = struct {
+    name: [:0]const u8,
+    SceneTypeGenerator: fn (type) type,
 
-test "basic add functionality" {
-    try std.testing.expect(add(3, 7) == 10);
-}
+    pub fn init(name: [:0]const u8, SceneTypeGenerator: fn (type) type) @This() {
+        return .{
+            .name = name,
+            .SceneTypeGenerator = SceneTypeGenerator,
+        };
+    }
+};
 
-test "basic add functionality2" {
-    try std.testing.expect(add(3, 7) == 10);
-}
+pub fn Init(comptime presets: []const ScreenPreset, comptime scenes: []const RenderableScene, comptime SceneContext: type, updates_per_s: comptime_int) type {
+    return struct {
+        pub const Renderer = renderer.Renderer(presets, scenes, SceneContext, updates_per_s);
+        const API = Renderer.API;
 
-test "basic add functionality3" {
-    try std.testing.expect(add(3, 7) == 10);
+        pub const Scene = scene.Scene;
+        pub const SceneComponent = scene.SceneComponent;
+
+        pub const ui = struct {
+            pub const Background = @import("gui-components/UiBackground.zig").UiBackground(Renderer.Context, Renderer.AccessEnum, API);
+            pub const Padding = @import("gui-components/UiPadding.zig").UiPadding(Renderer.Context, Renderer.AccessEnum, API);
+            pub const Rectangle = @import("gui-components/UiRectangle.zig").UiRectangle(Renderer.Context, Renderer.AccessEnum, API);
+            pub const Border = @import("gui-components/UiBorder.zig").UiBorder(Renderer.Context, Renderer.AccessEnum, API);
+            pub const Text = @import("gui-components/UiText.zig").UiText(Renderer.Context, Renderer.AccessEnum, API);
+            pub const Image = @import("gui-components/UiImage.zig").UiImage(Renderer.Context, Renderer.AccessEnum, API);
+            pub const Button = @import("gui-components/UiButton.zig").UiButton(Renderer.Context, Renderer.AccessEnum, API);
+            pub const SliderHandle = @import("gui-components/UiSliderHandle.zig").UiSliderHandle(Renderer.Context, Renderer.AccessEnum, API);
+            pub const Slider = @import("gui-components/UiSlider.zig").UiSlider(Renderer.Context, Renderer.AccessEnum, API);
+            pub const TextInputField = @import("gui-components/UiTextInputField.zig").UiTextInputField(Renderer.Context, Renderer.AccessEnum, API);
+            pub const TextValue = @import("gui-components/UiTextValue.zig").UiTextValue(Renderer.Context, Renderer.AccessEnum, API);
+        };
+
+        pub const audio = struct {
+            pub const Music = @import("sound-components/Music.zig");
+            pub const Sound = @import("sound-components/Sound.zig");
+        };
+    };
 }
