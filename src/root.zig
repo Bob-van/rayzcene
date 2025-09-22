@@ -2,6 +2,11 @@ const scene = @import("engine/scene.zig");
 
 const renderer = @import("engine/renderer.zig");
 
+/// EXPOSED ONLY BECAUSE YOU MIGHT WANT TO IMPLEMENT YOUR OWN STUFF
+///
+/// (for now used to expose some internal data types)
+pub const BackingEngine = @import("engine/engine.zig");
+
 pub const ScreenPreset = struct {
     width: f32,
     height: f32,
