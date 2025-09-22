@@ -48,7 +48,7 @@ pub fn setTraceLogLevel(logLevel: TraceLogLevel) void {
 }
 
 /// Initialize window and OpenGL context
-pub fn initWindow(width: i32, height: i32, title: [*:0]const u8) void {
+pub fn initWindow(width: i32, height: i32, title: [:0]const u8) void {
     loaded += 1;
     rlib.initWindow(width, height, title);
 }
@@ -59,7 +59,7 @@ pub fn getCurrentMonitor() i32 {
 }
 
 /// Measure string size for Font
-pub fn measureTextEx(font: Font, text: [*:0]const u8, fontSize: f32, spacing: f32) Vector2 {
+pub fn measureTextEx(font: Font, text: [:0]const u8, fontSize: f32, spacing: f32) Vector2 {
     return rlib.measureTextEx(font, text, fontSize, spacing);
 }
 
@@ -125,12 +125,12 @@ pub fn isMouseButtonPressed(button: MouseButton) bool {
 }
 
 /// Draw text using font and additional parameters
-pub fn drawTextEx(font: Font, text: [*:0]const u8, position: Vector2, fontSize: f32, spacing: f32, tint: Color) void {
+pub fn drawTextEx(font: Font, text: [:0]const u8, position: Vector2, fontSize: f32, spacing: f32, tint: Color) void {
     rlib.drawTextEx(font, text, position, fontSize, spacing, tint);
 }
 
 /// Load image from memory buffer, fileType refers to extension: i.e. '.png'
-pub fn loadImageFromMemory(fileType: [*:0]const u8, fileData: []const u8) !Image {
+pub fn loadImageFromMemory(fileType: [:0]const u8, fileData: []const u8) !Image {
     loaded += 1;
     return rlib.loadImageFromMemory(fileType, fileData);
 }
@@ -204,7 +204,7 @@ pub fn getScreenHeight() i32 {
 }
 
 /// Load font from memory buffer, fileType refers to extension: i.e. '.ttf'
-pub fn loadFontFromMemory(fileType: [*:0]const u8, fileData: ?[]const u8, fontSize: i32, fontChars: ?[]i32) !Font {
+pub fn loadFontFromMemory(fileType: [:0]const u8, fileData: ?[]const u8, fontSize: i32, fontChars: ?[]i32) !Font {
     loaded += 1;
     return Font.fromMemory(fileType, fileData, fontSize, fontChars);
 }
@@ -231,13 +231,13 @@ pub fn isMusicStreamPlaying(music: Music) bool {
 }
 
 /// Load music stream from data
-pub fn loadMusicStreamFromMemory(fileType: [*:0]const u8, data: []const u8) !Music {
+pub fn loadMusicStreamFromMemory(fileType: [:0]const u8, data: []const u8) !Music {
     loaded += 1;
     return rlib.loadMusicStreamFromMemory(fileType, data);
 }
 
 /// Load music stream from file
-pub fn loadMusicStreamFromFile(fileName: [*:0]const u8) !Music {
+pub fn loadMusicStreamFromFile(fileName: [:0]const u8) !Music {
     loaded += 1;
     return rlib.loadMusicStream(fileName);
 }
@@ -284,11 +284,11 @@ pub fn isKeyDown(key: KeyboardKey) bool {
     return rlib.isKeyDown(key);
 }
 
-pub fn getClipboardText() [*:0]const u8 {
+pub fn getClipboardText() [:0]const u8 {
     return rlib.getClipboardText();
 }
 
-pub fn setClipboardText(text: [*:0]const u8) void {
+pub fn setClipboardText(text: [:0]const u8) void {
     rlib.setClipboardText(text);
 }
 
