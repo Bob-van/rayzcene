@@ -153,6 +153,11 @@ pub fn Renderer(comptime presets: []const ScreenPreset, comptime scenes: []const
             engine.closeWindow();
             // remember that window was closed
             window_opened = false;
+
+            if (engine.getLoaded() != 0) {
+                log("Renderer was left with {} loaded assets on exit!", .{engine.getLoaded()});
+                if (builtin.mode == .Debug) unreachable;
+            }
         }
 
         fn wasWindowClosed() bool {
