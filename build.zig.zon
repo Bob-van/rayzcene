@@ -9,7 +9,7 @@
 
     .dependencies = .{
         .raylib = .{
-            .url = "git+https://github.com/raysan5/raylib#82d65e110a2caba862b31a3f1c11ca7a8ba60e3b",
+            .url = "git+https://github.com/raysan5/raylib#78a607b778cb806818c8a66d06190dc3548f3786",
             .hash = "raylib-5.6.0-dev-whq8uHRjyARJNFHTJ8fBtYU71IrnB-rTHJwuasjUnRWt",
         },
         //.xcode_frameworks = .{ //TO DO: do i need it? (build.zig in raylib has it now, test using it!)
