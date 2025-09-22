@@ -13,11 +13,13 @@ pub fn Renderer(comptime presets: []const ScreenPreset, comptime scenes: []const
         prev = screenPreset.ratio;
     }
 
-    comptime var enum_fields: [scenes.len]std.builtin.Type.EnumField = undefined;
-
-    for (scenes, 0..) |renderableScene, i| {
-        enum_fields[i] = .{ .name = renderableScene.name, .value = i };
-    }
+    const enum_fields: [scenes.len]std.builtin.Type.EnumField = blk: {
+        var fields: [scenes.len]std.builtin.Type.EnumField = undefined;
+        for (scenes, 0..) |renderableScene, i| {
+            fields[i] = .{ .name = renderableScene.name, .value = i };
+        }
+        break :blk fields;
+    };
 
     const update_interval_micro = if (updates_per_s == 0) 0 else 1000000 / updates_per_s;
 
