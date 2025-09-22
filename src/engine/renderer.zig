@@ -109,7 +109,7 @@ pub fn Renderer(comptime presets: []const ScreenPreset, comptime scenes: []const
             engine.setTraceLogLevel(logLevel);
         }
 
-        fn init(window_title: [*:0]const u8, fps: ?u31) void {
+        fn init(window_title: [:0]const u8, fps: ?u31) void {
             // open minimalized game window
             engine.initWindow(1, 1, window_title);
             // remember that window was opened
