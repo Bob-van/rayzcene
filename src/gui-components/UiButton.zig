@@ -32,7 +32,7 @@ pub fn UiButton(comptime Context: type, comptime AccessEnum: type, comptime API:
             );
             API.log("Image resized to: {d}x{d}\n", .{ rlib_image.width, rlib_image.height });
             const texture = try engine.loadTextureFromImage(rlib_image);
-            API.log("Texture created from image\n");
+            API.log("Texture created from image\n", .{});
             return .{
                 .presets = presets,
                 .position = .{
@@ -52,7 +52,7 @@ pub fn UiButton(comptime Context: type, comptime AccessEnum: type, comptime API:
 
         pub fn deinit(self: *@This()) void {
             engine.unloadTexture(self.texture);
-            API.log("Texture unloaded\n");
+            API.log("Texture unloaded\n", .{});
         }
 
         pub fn deinitGeneric(self: *@This(), _: std.mem.Allocator) void {

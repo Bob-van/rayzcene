@@ -26,7 +26,7 @@ pub fn UiText(comptime Context: type, comptime AccessEnum: type, comptime API: a
         pub fn init(allocator: std.mem.Allocator, comptime fmt: []const u8, args: anytype, font: *const engine.Font, color: engine.Color, presets: *const [API.preset_size]Preset) !@This() {
             const preset = presets[API.activePresetIndex()];
             API.log("Initializating UiText\n", .{});
-            const tmp_text = try std.fmt.allocPrintZ(allocator, fmt, args);
+            const tmp_text = try std.fmt.allocPrintSentinel(allocator, fmt, args, 0);
             const tmp_font_size = preset.font_size * window.scale;
             const tmp_spacing = preset.spacing * window.scale;
             return .{
@@ -59,7 +59,7 @@ pub fn UiText(comptime Context: type, comptime AccessEnum: type, comptime API: a
 
         pub fn reinit(self: *@This(), allocator: std.mem.Allocator, comptime fmt: []const u8, args: anytype) !void {
             self.deinit(allocator);
-            const tmp_text = try std.fmt.allocPrintZ(allocator, fmt, args);
+            const tmp_text = try std.fmt.allocPrintSentinel(allocator, fmt, args, 0);
             self.text = tmp_text;
         }
 

@@ -901,7 +901,7 @@ pub const Image = extern struct {
 
     /// Create an image from text (custom sprite font)
     pub fn initTextEx(font: Font, text: [:0]const u8, fontSize: f32, spacing: f32, t: Color) RaylibError!Image {
-        return rl.imageTextEx(font, text, fontSize, spacing, t);
+        return rl.imageTextEx(@bitCast(font), text, fontSize, spacing, t);
     }
 
     /// Generate image: plain color
@@ -2177,7 +2177,7 @@ pub fn loadImageAnimFromMemory(fileType: [:0]const u8, fileData: []const u8, fra
 pub fn loadImageFromMemory(fileType: [:0]const u8, fileData: []const u8) RaylibError!Image {
     const image = cdef.LoadImageFromMemory(@as([*c]const u8, @ptrCast(fileType)), @as([*c]const u8, @ptrCast(fileData)), @as(c_int, @intCast(fileData.len)));
     const isValid = cdef.IsImageValid(image);
-    return if (isValid) image else RaylibError.LoadImage;
+    return if (isValid) @bitCast(image) else RaylibError.LoadImage;
 }
 
 /// Create an image from text (default font)
@@ -2191,7 +2191,7 @@ pub fn imageText(text: [:0]const u8, fontSize: i32, color: Color) RaylibError!Im
 /// Create an image from text (custom sprite font)
 pub fn imageTextEx(font: Font, text: [:0]const u8, fontSize: f32, spacing: f32, tint: Color) RaylibError!Image {
     // TODO: ImageTextEx requires SUPPORT_MODULE_RTEXT. Error out if not loaded.
-    const image = cdef.ImageTextEx(font, @as([*c]const u8, @ptrCast(text)), fontSize, spacing, tint);
+    const image = cdef.ImageTextEx(@bitCast(font), @as([*c]const u8, @ptrCast(text)), fontSize, spacing, tint);
     const isValid = cdef.IsImageValid(image);
     return if (isValid) image else RaylibError.LoadImage;
 }
@@ -2217,14 +2217,14 @@ pub fn loadTexture(fileName: [:0]const u8) RaylibError!Texture2D {
 
 /// Load texture from image data
 pub fn loadTextureFromImage(image: Image) RaylibError!Texture2D {
-    const texture = cdef.LoadTextureFromImage(image);
+    const texture = cdef.LoadTextureFromImage(@bitCast(image));
     const isValid = cdef.IsTextureValid(texture);
-    return if (isValid) texture else RaylibError.LoadTexture;
+    return if (isValid) @bitCast(texture) else RaylibError.LoadTexture;
 }
 
 /// Load cubemap from image, multiple image cubemap layouts supported
 pub fn loadTextureCubemap(image: Image, layout: CubemapLayout) RaylibError!TextureCubemap {
-    const texture = cdef.LoadTextureCubemap(image, layout);
+    const texture = cdef.LoadTextureCubemap(@bitCast(image), layout);
     const isValid = cdef.IsTextureValid(texture);
     return if (isValid) texture else RaylibError.LoadTexture;
 }
@@ -2247,14 +2247,14 @@ pub fn colorToInt(color: Color) i32 {
 pub fn getFontDefault() RaylibError!Font {
     // TODO: GetFontDefault requires SUPPORT_DEFAULT_FONT. Error out if unset.
     const font = cdef.GetFontDefault();
-    const isValid = cdef.IsFontValid(font);
+    const isValid = cdef.IsFontValid(@bitCast(font));
     return if (isValid) font else RaylibError.LoadFont;
 }
 
 /// Load font from file into GPU memory (VRAM)
 pub fn loadFont(fileName: [:0]const u8) RaylibError!Font {
     const font = cdef.LoadFont(@as([*c]const u8, @ptrCast(fileName)));
-    const isValid = cdef.IsFontValid(font);
+    const isValid = cdef.IsFontValid(@bitCast(font));
     return if (isValid) font else RaylibError.LoadFont;
 }
 
@@ -2267,7 +2267,7 @@ pub fn loadFontEx(fileName: [:0]const u8, fontSize: i32, fontChars: ?[]const i32
         fontCharsLen = @as(i32, @intCast(fontCharsSure.len));
     }
     const font = cdef.LoadFontEx(@as([*c]const u8, @ptrCast(fileName)), @as(c_int, fontSize), fontCharsFinal, fontCharsLen);
-    const isValid = cdef.IsFontValid(font);
+    const isValid = cdef.IsFontValid(@bitCast(font));
     return if (isValid) font else RaylibError.LoadFont;
 }
 
@@ -2281,14 +2281,14 @@ pub fn loadFontFromMemory(fileType: [:0]const u8, fileData: ?[]const u8, fontSiz
     }
     const codepointCount: c_int = if (fontChars) |fontCharsSure| @intCast(fontCharsSure.len) else 0;
     const font = cdef.LoadFontFromMemory(@as([*c]const u8, @ptrCast(fileType)), @as([*c]const u8, @ptrCast(fileDataFinal)), @as(c_int, @intCast(fileDataLen)), @as(c_int, fontSize), @as([*c]const c_int, @ptrCast(fontChars)), codepointCount);
-    const isValid = cdef.IsFontValid(font);
-    return if (isValid) font else RaylibError.LoadFont;
+    const isValid = cdef.IsFontValid(@bitCast(font));
+    return if (isValid) @bitCast(font) else RaylibError.LoadFont;
 }
 
 /// Load font from Image (XNA style)
 pub fn loadFontFromImage(image: Image, key: Color, firstChar: i32) RaylibError!Font {
     const font = cdef.LoadFontFromImage(image, key, @as(c_int, firstChar));
-    const isValid = cdef.IsFontValid(font);
+    const isValid = cdef.IsFontValid(@bitCast(font));
     return if (isValid) font else RaylibError.LoadFont;
 }
 
@@ -2431,15 +2431,15 @@ pub fn loadWaveSamples(wave: Wave) []f32 {
 /// Load music stream from file
 pub fn loadMusicStream(fileName: [:0]const u8) RaylibError!Music {
     const music = cdef.LoadMusicStream(@as([*c]const u8, @ptrCast(fileName)));
-    const isValid = cdef.IsMusicValid(music);
+    const isValid = cdef.IsMusicValid(@bitCast(music));
     return if (isValid) music else RaylibError.LoadMusic;
 }
 
 /// Load music stream from data
 pub fn loadMusicStreamFromMemory(fileType: [:0]const u8, data: []const u8) RaylibError!Music {
     const music = cdef.LoadMusicStreamFromMemory(@as([*c]const u8, @ptrCast(fileType)), @as([*c]const u8, @ptrCast(data)), @as(c_int, @intCast(data.len)));
-    const isValid = cdef.IsMusicValid(music);
-    return if (isValid) music else RaylibError.LoadMusic;
+    const isValid = cdef.IsMusicValid(@bitCast(music));
+    return if (isValid) @bitCast(music) else RaylibError.LoadMusic;
 }
 
 /// Load audio stream (to stream raw audio pcm data)
@@ -2520,7 +2520,7 @@ pub fn unloadFontData(chars: []GlyphInfo) void {
 
 /// Draw multiple character (codepoint)
 pub fn drawTextCodepoints(font: Font, codepoints: []const c_int, position: Vector2, fontSize: f32, spacing: f32, tint: Color) void {
-    cdef.DrawTextCodepoints(font, @as([*c]const c_int, @ptrCast(codepoints)), @as(c_int, @intCast(codepoints.len)), position, fontSize, spacing, tint);
+    cdef.DrawTextCodepoints(@bitCast(font), @as([*c]const c_int, @ptrCast(codepoints)), @as(c_int, @intCast(codepoints.len)), position, fontSize, spacing, tint);
 }
 
 /// Load UTF-8 text encoded from codepoints array
@@ -2644,7 +2644,7 @@ pub fn isWindowState(flag: ConfigFlags) bool {
 
 /// Set window configuration state using flags
 pub fn setWindowState(flags: ConfigFlags) void {
-    cdef.SetWindowState(flags);
+    cdef.SetWindowState(@bitCast(flags));
 }
 
 /// Clear window configuration state flags
@@ -2859,7 +2859,7 @@ pub fn isCursorOnScreen() bool {
 
 /// Set background color (framebuffer clear color)
 pub fn clearBackground(color: Color) void {
-    cdef.ClearBackground(color);
+    cdef.ClearBackground(@bitCast(color));
 }
 
 /// Setup canvas (framebuffer) to start drawing
@@ -2914,7 +2914,7 @@ pub fn endShaderMode() void {
 
 /// Begin blending mode (alpha, additive, multiplied, subtract, custom)
 pub fn beginBlendMode(mode: BlendMode) void {
-    cdef.BeginBlendMode(mode);
+    cdef.BeginBlendMode(@intFromEnum(mode));
 }
 
 /// End blending mode (reset to default: alpha blending)
@@ -3099,7 +3099,7 @@ pub fn openURL(url: [:0]const u8) void {
 
 /// Set the current threshold (minimum) log level
 pub fn setTraceLogLevel(logLevel: TraceLogLevel) void {
-    cdef.SetTraceLogLevel(logLevel);
+    cdef.SetTraceLogLevel(@intFromEnum(logLevel));
 }
 
 /// Internal memory allocator
@@ -3449,12 +3449,12 @@ pub fn setGamepadVibration(gamepad: i32, leftMotor: f32, rightMotor: f32, durati
 
 /// Check if a mouse button has been pressed once
 pub fn isMouseButtonPressed(button: MouseButton) bool {
-    return cdef.IsMouseButtonPressed(button);
+    return cdef.IsMouseButtonPressed(@intFromEnum(button));
 }
 
 /// Check if a mouse button is being pressed
 pub fn isMouseButtonDown(button: MouseButton) bool {
-    return cdef.IsMouseButtonDown(button);
+    return cdef.IsMouseButtonDown(@intFromEnum(button));
 }
 
 /// Check if a mouse button has been released once
@@ -3479,7 +3479,7 @@ pub fn getMouseY() i32 {
 
 /// Get mouse position XY
 pub fn getMousePosition() Vector2 {
-    return cdef.GetMousePosition();
+    return @bitCast(cdef.GetMousePosition());
 }
 
 /// Get mouse delta between frames
@@ -3704,12 +3704,12 @@ pub fn drawRingLines(center: Vector2, innerRadius: f32, outerRadius: f32, startA
 
 /// Draw a color-filled rectangle
 pub fn drawRectangle(posX: i32, posY: i32, width: i32, height: i32, color: Color) void {
-    cdef.DrawRectangle(@as(c_int, posX), @as(c_int, posY), @as(c_int, width), @as(c_int, height), color);
+    cdef.DrawRectangle(@as(c_int, posX), @as(c_int, posY), @as(c_int, width), @as(c_int, height), @bitCast(color));
 }
 
 /// Draw a color-filled rectangle (Vector version)
 pub fn drawRectangleV(position: Vector2, size: Vector2, color: Color) void {
-    cdef.DrawRectangleV(position, size, color);
+    cdef.DrawRectangleV(@bitCast(position), @bitCast(size), @bitCast(color));
 }
 
 /// Draw a color-filled rectangle
@@ -3859,7 +3859,7 @@ pub fn checkCollisionCircleLine(center: Vector2, radius: f32, p1: Vector2, p2: V
 
 /// Check if point is inside rectangle
 pub fn checkCollisionPointRec(point: Vector2, rec: Rectangle) bool {
-    return cdef.CheckCollisionPointRec(point, rec);
+    return cdef.CheckCollisionPointRec(@bitCast(point), @bitCast(rec));
 }
 
 /// Check if point is inside circle
@@ -3894,7 +3894,7 @@ pub fn isImageValid(image: Image) bool {
 
 /// Unload image from CPU memory (RAM)
 pub fn unloadImage(image: Image) void {
-    cdef.UnloadImage(image);
+    cdef.UnloadImage(@bitCast(image));
 }
 
 /// Export image data to file, returns true on success
@@ -4022,7 +4022,7 @@ pub fn imageResize(image: *Image, newWidth: i32, newHeight: i32) void {
 
 /// Resize image (Nearest-Neighbor scaling algorithm)
 pub fn imageResizeNN(image: *Image, newWidth: i32, newHeight: i32) void {
-    cdef.ImageResizeNN(@as([*c]Image, @ptrCast(image)), @as(c_int, newWidth), @as(c_int, newHeight));
+    cdef.ImageResizeNN(@as([*c]cdef.Image, @ptrCast(image)), @as(c_int, newWidth), @as(c_int, newHeight));
 }
 
 /// Resize canvas and fill with color
@@ -4240,7 +4240,7 @@ pub fn isTextureValid(texture: Texture2D) bool {
 
 /// Unload texture from GPU memory (VRAM)
 pub fn unloadTexture(texture: Texture2D) void {
-    cdef.UnloadTexture(texture);
+    cdef.UnloadTexture(@bitCast(texture));
 }
 
 /// Check if a render texture is valid (loaded in GPU)
@@ -4285,7 +4285,7 @@ pub fn drawTexture(texture: Texture2D, posX: i32, posY: i32, tint: Color) void {
 
 /// Draw a Texture2D with position defined as Vector2
 pub fn drawTextureV(texture: Texture2D, position: Vector2, tint: Color) void {
-    cdef.DrawTextureV(texture, position, tint);
+    cdef.DrawTextureV(@bitCast(texture), @bitCast(position), @bitCast(tint));
 }
 
 /// Draw a Texture2D with extended parameters
@@ -4390,17 +4390,17 @@ pub fn getPixelDataSize(width: i32, height: i32, format: PixelFormat) i32 {
 
 /// Check if a font is valid (font data loaded, WARNING: GPU texture not checked)
 pub fn isFontValid(font: Font) bool {
-    return cdef.IsFontValid(font);
+    return cdef.IsFontValid(@bitCast(font));
 }
 
 /// Unload font from GPU memory (VRAM)
 pub fn unloadFont(font: Font) void {
-    cdef.UnloadFont(font);
+    cdef.UnloadFont(@bitCast(font));
 }
 
 /// Export font as code file, returns true on success
 pub fn exportFontAsCode(font: Font, fileName: [:0]const u8) bool {
-    return cdef.ExportFontAsCode(font, @as([*c]const u8, @ptrCast(fileName)));
+    return cdef.ExportFontAsCode(@bitCast(font), @as([*c]const u8, @ptrCast(fileName)));
 }
 
 /// Draw current FPS
@@ -4415,17 +4415,17 @@ pub fn drawText(text: [:0]const u8, posX: i32, posY: i32, fontSize: i32, color: 
 
 /// Draw text using font and additional parameters
 pub fn drawTextEx(font: Font, text: [:0]const u8, position: Vector2, fontSize: f32, spacing: f32, tint: Color) void {
-    cdef.DrawTextEx(font, @as([*c]const u8, @ptrCast(text)), position, fontSize, spacing, tint);
+    cdef.DrawTextEx(@bitCast(font), @as([*c]const u8, @ptrCast(text)), @bitCast(position), fontSize, spacing, @bitCast(tint));
 }
 
 /// Draw text using Font and pro parameters (rotation)
 pub fn drawTextPro(font: Font, text: [:0]const u8, position: Vector2, origin: Vector2, rotation: f32, fontSize: f32, spacing: f32, tint: Color) void {
-    cdef.DrawTextPro(font, @as([*c]const u8, @ptrCast(text)), position, origin, rotation, fontSize, spacing, tint);
+    cdef.DrawTextPro(@bitCast(font), @as([*c]const u8, @ptrCast(text)), position, origin, rotation, fontSize, spacing, tint);
 }
 
 /// Draw one character (codepoint)
 pub fn drawTextCodepoint(font: Font, codepoint: i32, position: Vector2, fontSize: f32, tint: Color) void {
-    cdef.DrawTextCodepoint(font, @as(c_int, codepoint), position, fontSize, tint);
+    cdef.DrawTextCodepoint(@bitCast(font), @as(c_int, codepoint), position, fontSize, tint);
 }
 
 /// Set vertical line spacing when drawing with line-breaks
@@ -4440,22 +4440,22 @@ pub fn measureText(text: [:0]const u8, fontSize: i32) i32 {
 
 /// Measure string size for Font
 pub fn measureTextEx(font: Font, text: [:0]const u8, fontSize: f32, spacing: f32) Vector2 {
-    return cdef.MeasureTextEx(font, @as([*c]const u8, @ptrCast(text)), fontSize, spacing);
+    return cdef.MeasureTextEx(@bitCast(font), @as([*c]const u8, @ptrCast(text)), fontSize, spacing);
 }
 
 /// Get glyph index position in font for a codepoint (unicode character), fallback to '?' if not found
 pub fn getGlyphIndex(font: Font, codepoint: i32) i32 {
-    return @as(i32, cdef.GetGlyphIndex(font, @as(c_int, codepoint)));
+    return @as(i32, cdef.GetGlyphIndex(@bitCast(font), @as(c_int, codepoint)));
 }
 
 /// Get glyph font info data for a codepoint (unicode character), fallback to '?' if not found
 pub fn getGlyphInfo(font: Font, codepoint: i32) GlyphInfo {
-    return cdef.GetGlyphInfo(font, @as(c_int, codepoint));
+    return cdef.GetGlyphInfo(@bitCast(font), @as(c_int, codepoint));
 }
 
 /// Get glyph rectangle in font atlas for a codepoint (unicode character), fallback to '?' if not found
 pub fn getGlyphAtlasRec(font: Font, codepoint: i32) Rectangle {
-    return cdef.GetGlyphAtlasRec(font, @as(c_int, codepoint));
+    return cdef.GetGlyphAtlasRec(@bitCast(font), @as(c_int, codepoint));
 }
 
 /// Unload UTF-8 text encoded from codepoints array
@@ -5074,72 +5074,72 @@ pub fn unloadWaveSamples(samples: []f32) void {
 
 /// Checks if a music stream is valid (context and buffers initialized)
 pub fn isMusicValid(music: Music) bool {
-    return cdef.IsMusicValid(music);
+    return cdef.IsMusicValid(@bitCast(music));
 }
 
 /// Unload music stream
 pub fn unloadMusicStream(music: Music) void {
-    cdef.UnloadMusicStream(music);
+    cdef.UnloadMusicStream(@bitCast(music));
 }
 
 /// Start music playing
 pub fn playMusicStream(music: Music) void {
-    cdef.PlayMusicStream(music);
+    cdef.PlayMusicStream(@bitCast(music));
 }
 
 /// Check if music is playing
 pub fn isMusicStreamPlaying(music: Music) bool {
-    return cdef.IsMusicStreamPlaying(music);
+    return cdef.IsMusicStreamPlaying(@bitCast(music));
 }
 
 /// Updates buffers for music streaming
 pub fn updateMusicStream(music: Music) void {
-    cdef.UpdateMusicStream(music);
+    cdef.UpdateMusicStream(@bitCast(music));
 }
 
 /// Stop music playing
 pub fn stopMusicStream(music: Music) void {
-    cdef.StopMusicStream(music);
+    cdef.StopMusicStream(@bitCast(music));
 }
 
 /// Pause music playing
 pub fn pauseMusicStream(music: Music) void {
-    cdef.PauseMusicStream(music);
+    cdef.PauseMusicStream(@bitCast(music));
 }
 
 /// Resume playing paused music
 pub fn resumeMusicStream(music: Music) void {
-    cdef.ResumeMusicStream(music);
+    cdef.ResumeMusicStream(@bitCast(music));
 }
 
 /// Seek music to a position (in seconds)
 pub fn seekMusicStream(music: Music, position: f32) void {
-    cdef.SeekMusicStream(music, position);
+    cdef.SeekMusicStream(@bitCast(music), position);
 }
 
 /// Set volume for music (1.0 is max level)
 pub fn setMusicVolume(music: Music, volume: f32) void {
-    cdef.SetMusicVolume(music, volume);
+    cdef.SetMusicVolume(@bitCast(music), volume);
 }
 
 /// Set pitch for a music (1.0 is base level)
 pub fn setMusicPitch(music: Music, pitch: f32) void {
-    cdef.SetMusicPitch(music, pitch);
+    cdef.SetMusicPitch(@bitCast(music), pitch);
 }
 
 /// Set pan for a music (0.5 is center)
 pub fn setMusicPan(music: Music, pan: f32) void {
-    cdef.SetMusicPan(music, pan);
+    cdef.SetMusicPan(@bitCast(music), pan);
 }
 
 /// Get music time length (in seconds)
 pub fn getMusicTimeLength(music: Music) f32 {
-    return cdef.GetMusicTimeLength(music);
+    return cdef.GetMusicTimeLength(@bitCast(music));
 }
 
 /// Get current music time played (in seconds)
 pub fn getMusicTimePlayed(music: Music) f32 {
-    return cdef.GetMusicTimePlayed(music);
+    return cdef.GetMusicTimePlayed(@bitCast(music));
 }
 
 /// Checks if an audio stream is valid (buffers initialized)

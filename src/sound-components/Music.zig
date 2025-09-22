@@ -5,7 +5,7 @@ const engine = @import("../engine/engine.zig");
 volume: f32,
 music: engine.Music,
 
-pub fn initFromFile(fileName: [*:0]const u8, volume: f32, loop: bool) !@This() {
+pub fn initFromFile(fileName: [:0]const u8, volume: f32, loop: bool) !@This() {
     var ret: @This() = .{
         .volume = volume,
         .music = try engine.loadMusicStreamFromFile(fileName),
@@ -16,7 +16,7 @@ pub fn initFromFile(fileName: [*:0]const u8, volume: f32, loop: bool) !@This() {
     return ret;
 }
 
-pub fn initFromMemory(fileType: [*:0]const u8, data: []const u8, volume: f32, loop: bool) !@This() {
+pub fn initFromMemory(fileType: [:0]const u8, data: []const u8, volume: f32, loop: bool) !@This() {
     var ret: @This() = .{
         .volume = volume,
         .music = try engine.loadMusicStreamFromMemory(fileType, data),
