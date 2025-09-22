@@ -1,9 +1,9 @@
 .{
-    .name = .rayzig,
+    .name = .rayzcene,
 
     .version = "0.0.1",
 
-    .fingerprint = 0x7bc27511e9f8589e,
+    .fingerprint = 0x98f0286a7aa643c8,
 
     .minimum_zig_version = "0.15.1",
 

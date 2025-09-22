@@ -5,7 +5,7 @@ pub fn build(b: *std.Build) void {
 
     const optimize = b.standardOptimizeOption(.{});
 
-    const mod = b.addModule("rayzig", .{
+    const mod = b.addModule("rayzcene", .{
         .root_source_file = b.path("src/root.zig"),
         .target = target,
     });
