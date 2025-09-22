@@ -35,7 +35,7 @@ pub fn API(Context: type, AccessEnum: type) type {
         /// (null means use monitor refresh rate)
         ///
         /// IMPORTANT: requires deinit() to be called before exiting!
-        init: fn ([*:0]const u8, ?u32) void,
+        init: fn ([:0]const u8, ?u32) void,
         /// Deinitializes window and all internal resources.
         ///
         /// IMPORTANT: all other render functions stop working afterwards!
