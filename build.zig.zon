@@ -12,6 +12,11 @@
             .url = "git+https://github.com/raysan5/raylib#82d65e110a2caba862b31a3f1c11ca7a8ba60e3b",
             .hash = "raylib-5.6.0-dev-whq8uHRjyARJNFHTJ8fBtYU71IrnB-rTHJwuasjUnRWt",
         },
+        //.xcode_frameworks = .{ //TO DO: do i need it? (build.zig in raylib has it now, test using it!)
+        //    .url = "git+https://github.com/hexops/xcode-frameworks#9a45f3ac977fd25dff77e58c6de1870b6808c4a7",
+        //    .hash = "N-V-__8AABHMqAWYuRdIlflwi8gksPnlUMQBiSxAqQAAZFms",
+        //    .lazy = true,
+        //},
     },
     .paths = .{
         "build.zig",

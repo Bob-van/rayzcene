@@ -17,6 +17,14 @@ pub fn build(b: *std.Build) void {
 
     const raylib = raylib_dep.artifact("raylib");
 
+    //if (target.result.os.tag == .macos) { //TO DO: do i need it? (build.zig in raylib has it now, test using it!)
+    //    if (b.lazyDependency("xcode_frameworks", .{})) |dep| {
+    //        raylib.addSystemFrameworkPath(dep.path("Frameworks"));
+    //        raylib.addSystemIncludePath(dep.path("include"));
+    //        raylib.addLibraryPath(dep.path("lib"));
+    //    }
+    //}
+
     mod.linkLibrary(raylib);
 
     const mod_tests = b.addTest(.{
