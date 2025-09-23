@@ -2,7 +2,8 @@ const std = @import("std");
 
 const api = @import("../engine/api.zig");
 const engine = @import("../engine/engine.zig");
-pub fn UiRectangle(comptime Context: type, comptime AccessEnum: type, comptime API: api.API(Context, AccessEnum)) type {
+pub fn UiRectangle(comptime Renderer: type) type {
+    const API = api.API(Renderer);
     const window = API.window();
     return struct {
         position: engine.Vector2,

@@ -1,4 +1,5 @@
 const scene = @import("engine/scene.zig");
+const api = @import("engine/api.zig");
 
 const renderer = @import("engine/renderer.zig");
 
@@ -36,23 +37,22 @@ pub const RenderableScene = struct {
 pub fn Init(comptime presets: []const ScreenPreset, comptime scenes: []const RenderableScene, comptime SceneContext: type, updates_per_s: comptime_int) type {
     return struct {
         pub const Renderer = renderer.Renderer(presets, scenes, SceneContext, updates_per_s);
-        const API = Renderer.API;
 
         pub const Scene = scene.Scene;
         pub const SceneComponent = scene.SceneComponent;
 
         pub const ui = struct {
-            pub const Background = @import("gui-components/UiBackground.zig").UiBackground(Renderer.Context, Renderer.AccessEnum, API);
-            pub const Padding = @import("gui-components/UiPadding.zig").UiPadding(Renderer.Context, Renderer.AccessEnum, API);
-            pub const Rectangle = @import("gui-components/UiRectangle.zig").UiRectangle(Renderer.Context, Renderer.AccessEnum, API);
-            pub const Border = @import("gui-components/UiBorder.zig").UiBorder(Renderer.Context, Renderer.AccessEnum, API);
-            pub const Text = @import("gui-components/UiText.zig").UiText(Renderer.Context, Renderer.AccessEnum, API);
-            pub const Image = @import("gui-components/UiImage.zig").UiImage(Renderer.Context, Renderer.AccessEnum, API);
-            pub const Button = @import("gui-components/UiButton.zig").UiButton(Renderer.Context, Renderer.AccessEnum, API);
-            pub const SliderHandle = @import("gui-components/UiSliderHandle.zig").UiSliderHandle(Renderer.Context, Renderer.AccessEnum, API);
-            pub const Slider = @import("gui-components/UiSlider.zig").UiSlider(Renderer.Context, Renderer.AccessEnum, API);
-            pub const TextInputField = @import("gui-components/UiTextInputField.zig").UiTextInputField(Renderer.Context, Renderer.AccessEnum, API);
-            pub const TextValue = @import("gui-components/UiTextValue.zig").UiTextValue(Renderer.Context, Renderer.AccessEnum, API);
+            pub const Background = @import("gui-components/UiBackground.zig").UiBackground(Renderer);
+            pub const Padding = @import("gui-components/UiPadding.zig").UiPadding(Renderer);
+            pub const Rectangle = @import("gui-components/UiRectangle.zig").UiRectangle(Renderer);
+            pub const Border = @import("gui-components/UiBorder.zig").UiBorder(Renderer);
+            pub const Text = @import("gui-components/UiText.zig").UiText(Renderer);
+            pub const Image = @import("gui-components/UiImage.zig").UiImage(Renderer);
+            pub const Button = @import("gui-components/UiButton.zig").UiButton(Renderer);
+            pub const SliderHandle = @import("gui-components/UiSliderHandle.zig").UiSliderHandle(Renderer);
+            pub const Slider = @import("gui-components/UiSlider.zig").UiSlider(Renderer);
+            pub const TextInputField = @import("gui-components/UiTextInputField.zig").UiTextInputField(Renderer);
+            pub const TextValue = @import("gui-components/UiTextValue.zig").UiTextValue(Renderer);
         };
 
         pub const audio = struct {

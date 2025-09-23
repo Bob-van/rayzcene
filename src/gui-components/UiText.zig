@@ -10,7 +10,8 @@ pub const InitPreset = struct {
     spacing: f32,
 };
 
-pub fn UiText(comptime Context: type, comptime AccessEnum: type, comptime API: api.API(Context, AccessEnum)) type {
+pub fn UiText(comptime Renderer: type) type {
+    const API = api.API(Renderer);
     const window = API.window();
     return struct {
         presets: *const [API.preset_size]InitPreset,

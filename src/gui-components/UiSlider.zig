@@ -3,8 +3,9 @@ const std = @import("std");
 const api = @import("../engine/api.zig");
 const engine = @import("../engine/engine.zig");
 
-pub fn UiSlider(comptime Context: type, comptime AccessEnum: type, comptime API: api.API(Context, AccessEnum)) type {
-    const UiSliderHandle = @import("UiSliderHandle.zig").UiSliderHandle(Context, AccessEnum, API);
+pub fn UiSlider(comptime Renderer: type) type {
+    const API = api.API(Renderer);
+    const UiSliderHandle = @import("UiSliderHandle.zig").UiSliderHandle(Renderer);
     const window = API.window();
     return struct {
         presets: *const [API.preset_size]Preset,

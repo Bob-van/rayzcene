@@ -8,7 +8,8 @@ pub const InitPreset = struct {
     height: f32,
 };
 
-pub fn UiSliderHandle(comptime Context: type, comptime AccessEnum: type, comptime API: api.API(Context, AccessEnum)) type {
+pub fn UiSliderHandle(comptime Renderer: type) type {
+    const API = api.API(Renderer);
     const window = API.window();
     return struct {
         presets: *const [API.preset_size]Preset,

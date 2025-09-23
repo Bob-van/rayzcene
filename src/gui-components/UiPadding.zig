@@ -3,7 +3,8 @@ const api = @import("../engine/api.zig");
 const engine = @import("../engine/engine.zig");
 
 /// Adds colored blocks to the edges of screen (when window size is not exact fit)
-pub fn UiPadding(comptime Context: type, comptime AccessEnum: type, comptime API: api.API(Context, AccessEnum)) type {
+pub fn UiPadding(comptime Renderer: type) type {
+    const API = api.API(Renderer);
     const window = API.window();
     return struct {
         color: engine.Color,

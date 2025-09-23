@@ -3,7 +3,8 @@ const std = @import("std");
 const api = @import("../engine/api.zig");
 const engine = @import("../engine/engine.zig");
 
-pub fn UiBackground(comptime Context: type, comptime AccessEnum: type, comptime API: api.API(Context, AccessEnum)) type {
+pub fn UiBackground(comptime Renderer: type) type {
+    const API = api.API(Renderer);
     return struct {
         color: engine.Color,
 

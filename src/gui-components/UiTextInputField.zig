@@ -5,7 +5,8 @@ const engine = @import("../engine/engine.zig");
 
 const UiTextValue = @import("UiTextValue.zig").UiTextValue;
 
-pub fn UiTextInputField(comptime Context: type, comptime AccessEnum: type, comptime API: api.API(Context, AccessEnum)) type {
+pub fn UiTextInputField(comptime Renderer: type) type {
+    const API = api.API(Renderer);
     const window = API.window();
     return struct {
         value: *UiTextValue,

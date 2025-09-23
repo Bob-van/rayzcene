@@ -24,8 +24,10 @@ pub fn Renderer(comptime presets: []const ScreenPreset, comptime scenes: []const
     const update_interval_micro = if (updates_per_s == 0) 0 else 1000000 / updates_per_s;
 
     return struct {
+        /// Context type that functions take and gets passed to the scenes
         pub const Context = SceneContext;
 
+        /// Enum of exposed scenes
         pub const AccessEnum = @Type(.{ .@"enum" = .{
             .tag_type = usize,
             .fields = &enum_fields,
@@ -33,7 +35,8 @@ pub fn Renderer(comptime presets: []const ScreenPreset, comptime scenes: []const
             .is_exhaustive = true,
         } });
 
-        pub const API: api.API(Context, AccessEnum) = .{
+        /// Use API, not this, this is internal exposure that API uses!
+        pub const table: api.FnTable(@This()) = .{
             .log = log,
             .window = getWindow,
             .preset_size = presets.len,
@@ -49,6 +52,9 @@ pub fn Renderer(comptime presets: []const ScreenPreset, comptime scenes: []const
             .requestTermination = requestTermination,
             .requestFpsCapUpdate = requestFpsCapUpdate,
         };
+
+        /// Exposed Renderer API (constructed like this mainly for LSP reasons)
+        pub const API = api.API(@This());
 
         const Types = blk: {
             var types: [scenes.len]type = undefined;
