@@ -25,18 +25,20 @@ pub const ScreenPreset = struct {
 pub const RenderableScene = struct {
     name: [:0]const u8,
     SceneTypeGenerator: fn (type) type,
+    updates_per_s: comptime_int,
 
-    pub fn init(name: [:0]const u8, SceneTypeGenerator: fn (type) type) @This() {
+    pub fn init(name: [:0]const u8, SceneTypeGenerator: fn (type) type, updates_per_s: comptime_int) @This() {
         return .{
             .name = name,
             .SceneTypeGenerator = SceneTypeGenerator,
+            .updates_per_s = updates_per_s,
         };
     }
 };
 
-pub fn Init(comptime presets: []const ScreenPreset, comptime scenes: []const RenderableScene, comptime SceneContext: type, updates_per_s: comptime_int) type {
+pub fn Init(comptime presets: []const ScreenPreset, comptime scenes: []const RenderableScene, comptime SceneContext: type) type {
     return struct {
-        pub const Renderer = renderer.Renderer(presets, scenes, SceneContext, updates_per_s);
+        pub const Renderer = renderer.Renderer(presets, scenes, SceneContext);
 
         pub const Scene = scene.Scene;
         pub const SceneComponent = scene.SceneComponent;

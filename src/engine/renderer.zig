@@ -6,7 +6,7 @@ const ScreenPreset = @import("../root.zig").ScreenPreset;
 const RenderableScene = @import("../root.zig").RenderableScene;
 
 /// updates_per_s = 0 -> never update
-pub fn Renderer(comptime presets: []const ScreenPreset, comptime scenes: []const RenderableScene, comptime SceneContext: type, updates_per_s: comptime_int) type {
+pub fn Renderer(comptime presets: []const ScreenPreset, comptime scenes: []const RenderableScene, comptime SceneContext: type) type {
     var prev = std.math.floatMax(f32);
     for (presets) |screenPreset| {
         if (prev < screenPreset.ratio) @compileError("\"comptime presets: []const ScreenPreset\" need to be ordered in descending way based on \"ratio: f32\"");
@@ -21,7 +21,19 @@ pub fn Renderer(comptime presets: []const ScreenPreset, comptime scenes: []const
         break :blk fields;
     };
 
-    const update_interval_micro = if (updates_per_s == 0) 0 else 1000000 / updates_per_s;
+    const update_interval_micro: [scenes.len]comptime_int = blk: {
+        var intervals: [scenes.len]comptime_int = undefined;
+        for (scenes, 0..) |renderableScene, i| {
+            intervals[i] = if (renderableScene.updates_per_s == 0) 0 else 1000000 / renderableScene.updates_per_s;
+        }
+        break :blk intervals;
+    };
+    const does_it_ever_update: bool = blk: {
+        for (scenes) |renderableScene| {
+            if (renderableScene.updates_per_s != 0) break :blk true;
+        }
+        break :blk false;
+    };
 
     return struct {
         /// Context type that functions take and gets passed to the scenes
@@ -95,7 +107,7 @@ pub fn Renderer(comptime presets: []const ScreenPreset, comptime scenes: []const
 
         var fps_cap: u31 = undefined;
 
-        var last_update_micro: if (update_interval_micro != 0) i64 else void = undefined;
+        var last_update_micro: if (does_it_ever_update) i64 else void = undefined;
 
         fn log(comptime fmt: []const u8, args: anytype) void {
             if (builtin.mode == .Debug) {
@@ -201,16 +213,17 @@ pub fn Renderer(comptime presets: []const ScreenPreset, comptime scenes: []const
         }
 
         fn render(context: Context) error{ SceneInitFailed, SceneUpdateFailed, SceneRenderFailed }!void {
-            if (update_interval_micro != 0) {
-                const now = std.time.microTimestamp();
-                switch (current_scene) {
-                    inline else => |tag| {
-                        while (last_update_micro + update_interval_micro < now) {
-                            @field(scene, scenes[@intFromEnum(tag)].name).update(context) catch return error.SceneUpdateFailed;
-                            last_update_micro += update_interval_micro;
+            switch (current_scene) {
+                inline else => |tag| {
+                    const interval = update_interval_micro[@intFromEnum(tag)];
+                    if (comptime interval != 0) {
+                        const now: i64 = std.time.microTimestamp();
+                        while (last_update_micro + interval < now) {
+                            @field(scene, scenes[@intFromEnum(tag)].name).update(context, last_update_micro + interval) catch return error.SceneUpdateFailed;
+                            last_update_micro += interval;
                         }
-                    },
-                }
+                    }
+                },
             }
             const should_render = try update(context, true);
             // begin single frame render
@@ -313,7 +326,9 @@ pub fn Renderer(comptime presets: []const ScreenPreset, comptime scenes: []const
                     scene = @unionInit(StorageUnion, scenes[@intFromEnum(tag)].name, .empty);
                     // initialize new scene in the union (in place, so self referencial pointers stay valid)
                     @field(scene, scenes[@intFromEnum(tag)].name).init(context) catch return error.SceneInitFailed;
-                    last_update_micro = std.time.microTimestamp();
+                    if (comptime update_interval_micro[@intFromEnum(tag)] != 0) {
+                        last_update_micro = std.time.microTimestamp();
+                    }
                     if (next_scene == current_scene) {
                         log("Scene \"{s}\" rescaled\n", .{scenes[@intFromEnum(tag)].name});
                     } else {
